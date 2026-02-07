@@ -31,9 +31,9 @@ export default function AuthLayout() {
         </div>
       </section>
       <section className="auth-panel">
-        <div className="auth-card">
+        {/* <div className="auth-card"> */}
           <Outlet />
-        </div>
+        {/* </div> */}
         <p className="auth-footer">
           Need help? <Link to="/login">Contact support</Link>
         </p>
