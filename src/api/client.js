@@ -20,19 +20,32 @@ export async function request(path, options = {}) {
     headers.set('Authorization', `Bearer ${normalizeToken(resolvedToken)}`)
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  })
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    })
 
-  const text = await response.text()
-  const data = text ? JSON.parse(text) : null
+    const text = await response.text()
+    let data = null
+    try {
+      data = text ? JSON.parse(text) : null
+    } catch {
+      data = null
+    }
 
-  if (!response.ok) {
-    const message = data?.message || text || 'Request failed.'
-    throw new Error(message)
+    if (!response.ok) {
+      const message = data?.message || data?.error || text || `HTTP ${response.status}`
+      throw new Error(message)
+    }
+
+    return data
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Network error. Please check your connection.')
   }
-
-  return data
 }
+
